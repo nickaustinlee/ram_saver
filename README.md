@@ -35,4 +35,20 @@ Explanation:
 
 NOTE: You can change the thresholds for your personal definition of "memory pressure". I'm using an older computer (Macbook Air M2, with 16GB RAM), and I empirically found that Compressed Memory > 5 GB or SWAP > 1 GB usually means the system is starting to experience pressure. 
 
+## Excluding Apps ##
 
+Add the name of each app to the `exclude_apps.txt` file, on a new line. The name of the app might differ slightly from the name of the process to kill. You can use this command to figure out the exact names: 
+
+```bash
+ps aux | grep -i <app_name>
+```
+For example, when I do this for backblaze, I discover the process name is actually "Backblaze11". 
+
+```bash
+Mac:Programming nicklee$ ps aux | grep -i backblaze
+nicklee          83792   0.4  0.4 411874400  71808   ??  S     7:48PM   0:00.94 /Applications/Backblaze.app/Contents/MacOS/Backblaze11
+root             82436   0.1  0.0 411357008   7008   ??  S     6:35PM   0:42.20 /Library/Backblaze.bzpkg/bzfilelist
+nicklee           1730   0.0  0.3 412004288  56080   ??  S    13Mar25   0:16.42 /Library/Backblaze.bzpkg/bzbmenu.app/Contents/MacOS/bzbmenu
+root              1053   0.0  0.0 411741328   6464   ??  Ss   13Mar25   8:59.78 /Applications/Backblaze.app/Contents/MacOS/bzserv
+```
+Therefore, I would put Backblaze11 on my exclusion list. 
