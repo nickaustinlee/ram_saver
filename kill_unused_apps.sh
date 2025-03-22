@@ -3,7 +3,7 @@
 # Default Configuration
 THRESHOLD_MINUTES=120  # Default minimum idle time before considering an app
 MEMORY_THRESHOLD_MB=200  # Default memory threshold in MB
-EXCLUDE_APPS_FILE="exclude_apps.txt"
+EXCLUDE_APPS_FILE="$(dirname "$0")/exclude_apps.txt"
 DRY_RUN=false  # Default: actually kill apps
 TOTAL_RAM_FREED=0  # Track total RAM freed up
 
@@ -40,33 +40,22 @@ for arg in "$@"; do
     esac
 done
 
-# Function to load excluded apps from a text file
-load_excluded_apps_txt() {
+# Function to load and clean excluded apps
+load_excluded_apps() {
+    EXCLUDE_APPS_CLEANED=()
     if [[ -f "$EXCLUDE_APPS_FILE" ]]; then
-        EXCLUDE_APPS=()
         while IFS= read -r line; do
-            EXCLUDE_APPS+=("$line")
+            trimmed=$(echo "$line" | xargs)  # Trim spaces and remove newlines
+            [[ -n "$trimmed" ]] && EXCLUDE_APPS_CLEANED+=("$trimmed")
         done < "$EXCLUDE_APPS_FILE"
-    else
-        EXCLUDE_APPS=()
     fi
 }
 
-# Function to load excluded apps from a JSON file
-load_excluded_apps_json() {
-    if [[ -f "$EXCLUDE_APPS_FILE" ]]; then
-        EXCLUDE_APPS=($(jq -r '.excluded_apps[]' "$EXCLUDE_APPS_FILE"))
-    else
-        EXCLUDE_APPS=()
-    fi
-}
+# Load the exclusion list
+load_excluded_apps
 
-# Determine file format and load exclusions
-if [[ "$EXCLUDE_APPS_FILE" == *.json ]]; then
-    load_excluded_apps_json
-else
-    load_excluded_apps_txt
-fi
+# Debug: Show loaded exclusions
+echo "🚀 Loaded exclusion list: ${EXCLUDE_APPS_CLEANED[@]}"
 
 # Get the currently active (foreground) application
 ACTIVE_APP=$(osascript -e 'tell application "System Events" to get name of (processes whose frontmost is true)')
@@ -76,8 +65,9 @@ ACTIVE_APP=$(echo "$ACTIVE_APP" | sed 's/^ *//;s/ *$//')
 osascript -e 'tell application "System Events" to get name of (processes whose background only is false)' | tr ',' '\n' | while read app; do
     app=$(echo "$app" | sed 's/^ *//;s/ *$//')
 
-    # Check if app is in the exclusion list
-    if [[ " ${EXCLUDE_APPS[@]} " =~ " ${app} " ]]; then
+    # Skip scanning if app is in the exclusion list BEFORE doing anything else
+    if [[ " ${EXCLUDE_APPS_CLEANED[*]} " =~ " $app " ]]; then
+        echo "[SKIP] \"$app\" is in the exclusion list. Skipping..."
         continue
     fi
 
@@ -87,7 +77,7 @@ osascript -e 'tell application "System Events" to get name of (processes whose b
         continue
     fi
 
-    # Check if the app has any visible windows
+    # Check if the app has any visible windows BEFORE killing
     HAS_WINDOWS=$(osascript -e "tell application \"System Events\" to count windows of process \"$app\"" 2>/dev/null)
     if [[ "$HAS_WINDOWS" -gt 0 ]]; then
         echo "[SKIP] \"$app\" has $HAS_WINDOWS visible window(s). Skipping..."
@@ -153,4 +143,3 @@ fi
 
 # Clean up temporary file
 rm -f "$TMP_RAM_FILE"
-
