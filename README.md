@@ -1,4 +1,4 @@
-# OS X Ram Saver Scripts
+# OS X RAM Saver Scripts
 
 Are you sick of background apps eating up precious RAM on your Mac? I've noticed that even with 16 GB of RAM, I need to spend time killing unused background apps to free up space when I'm doing intensive work. This is annoying, and I built a program to help do this work for me in the background. If you have > 32 GB of RAM, you probably won't need this app.
 
