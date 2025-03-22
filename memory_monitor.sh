@@ -5,7 +5,7 @@ export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 # Define high memory pressure thresholds
 COMPRESSED_LIMIT_GB=5       # If Compressed Memory > 5GB, trigger high pressure
 SWAP_LIMIT_MB=2000          # If Swap > 2GB, trigger high pressure
-FREE_MEM_LIMIT_MB=500       # If Free Memory < 500MB, trigger high pressure
+#FREE_MEM_LIMIT_MB=500       # If Free Memory < 500MB, trigger high pressure
 
 # Get full memory stats from `top`
 PHYS_MEM_STATS=$(top -l 1 | grep "PhysMem")
