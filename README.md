@@ -21,7 +21,7 @@ crontab -e
 Add this to the cron jobs: 
 
 ```bash
-*/10 * * * * /Users/your_username/path/to/ram_saver/memory_watcher.sh >> /Users/your_username/path/to/ram_saver/memory_watcher.log 2>&1
+*/10 * * * * /Users/your_username/path/to/ram_saver/memory_watcher.sh >> /Users/your_username/path/to/ram_saver/memory_monitor.log 2>&1
 ```
 (put the appropriate username and/or file path)
 
