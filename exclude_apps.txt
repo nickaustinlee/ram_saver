@@ -1,0 +1,7 @@
+Finder
+Terminal
+Activity Monitor
+TextEdit
+Backblaze11
+RescueTime
+Spotify
